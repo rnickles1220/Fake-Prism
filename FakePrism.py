@@ -7,15 +7,34 @@ Created on Tue Aug 13 16:16:47 2024
 
 """
 #This is going to the generic script for the quantification data analysis. 
-pip install scipy
+#pip install scipy
 from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
+import FakePrism_GUI_module
 
-# WHen inputing the data into the CSV you put the pulldown in column 1, and the binding partners in rows
-#2,3, 4, etc. THere can be no text, only the numbers. Follow the excel template with comments for guidance. 
+# When inputing the data into the CSV you put the pulldown in column 1, and the binding partners in rows
+#2,3, 4, etc. There can be no text, only the numbers. Follow the excel template with comments for guidance. 
 
-data_set = np.loadtxt('Quantification_test.csv',delimiter=',')
+userFileTitle = ""
+userParameters = {
+    'numReps' : 0,
+    'numBindingPartners' : 0,
+    'xaxisTitle' : "",
+    'yaxisTitle' : "",
+    'color' : ""
+}
+
+userParameters = FakePrism_GUI_module.createParameterWindow()
+
+print(userParameters)
+
+userFileTitle = "Quantification_test"
+csvFileTitle = userFileTitle + ".csv"
+
+
+
+data_set = np.loadtxt(csvFileTitle,delimiter=',')
 data_set = np.array(data_set)
 data_set = np.transpose(data_set)
 
@@ -80,8 +99,8 @@ for j in range(number_binding*2):
     Stat_comp = int(input('How many Statistical comparisons do you want to do? '))
     for i in range(Stat_comp):
         t_stat, p_value = stats.ttest_ind(list1, list2)
-        if p_values => 0.05:
-            
+        if p_values >= 0.05:
+            pass
     
     for bar in bars:
         category = bar.get_x() + bar.get_width() / 2
