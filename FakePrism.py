@@ -16,42 +16,45 @@ import FakePrism_GUI_module
 # When inputing the data into the CSV you put the pulldown in column 1, and the binding partners in rows
 #2,3, 4, etc. There can be no text, only the numbers. Follow the excel template with comments for guidance. 
 
+#All neccessary chart parameters
 userFileTitle = ""
 userParameters = {
     'numReps' : 0,
     'numBindingPartners' : 0,
-    'xaxisTitle' : "",
+    'mainTitle' : "",
     'yaxisTitle' : "",
-    'color' : ""
+    'color' : "",
+    'experimental_conditions' : []
 }
 
 userParameters = FakePrism_GUI_module.createParameterWindow()
 
 print(userParameters)
 
+#TODO add title of csv file to the GUI
 userFileTitle = "Quantification_test"
 csvFileTitle = userFileTitle + ".csv"
-
-
 
 data_set = np.loadtxt(csvFileTitle,delimiter=',')
 data_set = np.array(data_set)
 data_set = np.transpose(data_set)
 
-number_reps = int(input('How many Replicatates: '))
-number_conditions = int((len(np.transpose(data_set)) + 1) / number_reps)
-number_binding = int(input('How many binding partners: '))
+number_reps = int(userParameters['numReps']) #int(input('How many Replicatates: '))
+number_conditions = int(len(userParameters['experimental_conditions']))
 
-conditions = []
-for j in range(number_conditions):
-    x = input('Input Experiment Conditon to be used in Graph: ')
-    conditions.append(x)
+#verify correct number of conditions included
+if number_conditions != int(int(len(np.transpose(data_set)) + 1) / int(userParameters['numReps'])):
+    print(number_conditions)
+    print(int(int(len(np.transpose(data_set)) + 1) / int(userParameters['numReps'])))
+    print("Error, not enough conditions reported!")
+    raise SystemExit
+number_binding = int(userParameters['numBindingPartners']) #int(input('How many binding partners: '))
 
+conditions = userParameters['experimental_conditions']
 
 offset = number_conditions
 
-
-# THis will be the normalizations for the binding partner 1 lysates
+# This will be the normalizations for the binding partner 1 lysates
 for j in range(number_binding*2):
     Binding_Lysates =[]
     #This will set up the arrays that will be used in the rest of the function
@@ -60,7 +63,8 @@ for j in range(number_binding*2):
     
     binding_lys_column = int(input('What column is the binding partner in? '))
     bind_lys = data_set[binding_lys_column]
-    for i in range(number_reps):
+
+    for i in range(int(number_reps)):
         #This part will take the values above and normalize them. 
         pulldown_lysate = pulldown_lys[i*number_conditions:i*number_conditions+offset]
         binding_lysate = bind_lys[i*number_conditions:i*number_conditions+offset]
@@ -84,11 +88,12 @@ for j in range(number_binding*2):
         if np.isnan(avg):
             avg = 0
         values_lys.append(avg)
-    #Calculate the error for hte error bars
+
+    #Calculate the error for the error bars
     std_dev = np.std(np.transpose(Lysates),axis=1,ddof=1)
-    color = input('Common colors are blue, green, lightgreen, red, orange, skyblue, turquoise, etc. \nChoose a color: ')
+    color = userParameters['color'] #input('Common colors are blue, green, lightgreen, red, orange, skyblue, turquoise, etc. \nChoose a color: ')
+
     condition_dict = {}
-    
     for i, condition in enumerate(conditions):
         condition_dict[condition] = np.transpose(Lysates)[i].tolist()
 #bars = ax.bar(conditions, means, yerr=errors, capsize=5, color='skyblue', edgecolor='black')
@@ -96,11 +101,12 @@ for j in range(number_binding*2):
     bars = ax.bar(conditions,values_lys, yerr=std_dev, capsize=5,edgecolor='black',color=color)
     
 # This does the T-Test for statistical signifigance
-    Stat_comp = int(input('How many Statistical comparisons do you want to do? '))
-    for i in range(Stat_comp):
-        t_stat, p_value = stats.ttest_ind(list1, list2)
-        if p_values >= 0.05:
-            pass
+    #Stat_comp = int(input('How many Statistical comparisons do you want to do? '))
+    #for i in range(Stat_comp):
+        #pass
+        #t_stat, p_value = stats.ttest_ind(list1, list2)
+        #if p_values >= 0.05:
+            #pass
     
     for bar in bars:
         category = bar.get_x() + bar.get_width() / 2
@@ -114,8 +120,8 @@ for j in range(number_binding*2):
 #plt.ylabel('Values', fontsize=14, fontweight='bold', family='Helvetica')
 #plt.title('Bar Graph with Helvetica Font', fontsize=16, fontweight='bold', family='Helvetica')
 
-    plt.title(input('Enter title: '), fontsize=16, fontweight='bold',family='helvetica')
-    plt.ylabel(input('Enter Y-Axis Label: '),fontsize=14, fontweight='bold',family='helvetica')
+    plt.title(userParameters['mainTitle'], fontsize=16, fontweight='bold',family='helvetica')
+    plt.ylabel(userParameters['yaxisTitle'],fontsize=14, fontweight='bold',family='helvetica')
     plt.xticks(fontsize=12, fontweight='bold', family='helvetica')
     plt.yticks(fontsize=12, fontweight='bold', family='helvetica')
     plt.show()
