@@ -3,6 +3,23 @@
 import tkinter as tk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import csv
+import numpy as np
+
+
+def load_csv():
+    file_path = tk.filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+    if file_path:
+        try:
+            data_set = np.loadtxt(file_path,delimiter=',')
+            data_set = np.array(data_set)
+            data_set = np.transpose(data_set)
+            print("Loaded CSV file successfully!")
+        except FileNotFoundError:
+            print("File not found.")
+    else:
+        print("No file selected.")
+
 
 #Creates tkinter window and returns a dictionary with selected values#
 
@@ -137,6 +154,9 @@ def createParameterWindow():
     # Create a button to get the input text
     button = tk.Button(master=containerframe, text="Submit Parameters", command=collectParameters)
     button.grid(row=4, column=0)
+
+    load_button = tk.Button(master=containerframe, text="Load CSV", command=load_csv)
+    load_button.grid(row=5, column=0)
 
     # Run the application
     root.mainloop()

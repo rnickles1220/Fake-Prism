@@ -6,6 +6,7 @@ Created on Tue Aug 13 16:16:47 2024
 @author: rileynickles
 
 """
+
 #This is going to the generic script for the quantification data analysis. 
 #pip install scipy
 from scipy import stats
